@@ -1,0 +1,36 @@
+name: Build mod
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rozpakuj projekt z pliku zip
+        run: |
+          unzip -o medieval-houses-mod.zip -d .
+          ls -la medieval-houses
+
+      - name: Ustaw JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Ustaw Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Zbuduj mod
+        working-directory: medieval-houses
+        run: gradle build
+
+      - name: Wgraj gotowy .jar jako artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medieval-houses-mod
+          path: medieval-houses/build/libs/*.jar
